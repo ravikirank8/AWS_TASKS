@@ -1,0 +1,93 @@
+1️⃣ Using AWS Management Console
+Sign in → Go to EC2.
+
+Select the instance you want to create an AMI from.
+
+Click Actions → Image and templates → Create image.
+
+Fill in details:
+
+Image name → e.g., MyWebServer-AMI
+
+Description → Optional
+
+No reboot → Check if you don’t want EC2 to reboot before AMI creation
+(AWS recommends reboot for filesystem consistency)
+
+Click Create image.
+
+You’ll see the AMI under Images → AMIs with a pending status until it’s available.
+
+2️⃣ Using AWS CLI
+bash
+Copy
+Edit
+aws ec2 create-image \
+    --instance-id i-0123456789abcdef0 \
+    --name "MyWebServer-AMI" \
+    --description "AMI backup of my web server" \
+    --no-reboot
+Parameters:
+
+--instance-id → Your EC2 instance ID
+
+--name → Name for the AMI
+
+--description → Optional description
+
+--no-reboot → Optional; skips reboot (use only if you understand data consistency risks)
+
+===
+
+1️⃣ Using AWS Management Console
+Sign in → Go to EC2.
+
+On the left menu, click Volumes.
+Select the EBS volume you want to snapshot.
+Click Actions → Create snapshot.
+Fill in:
+Description → e.g., Daily backup of web server volume
+Tags → Optional (but recommended for tracking)
+Click Create snapshot.
+View progress under Snapshots (status will be pending until complete).
+
+2️⃣ Using AWS CLI
+
+aws ec2 create-snapshot \
+    --volume-id vol-0123456789abcdef0 \
+    --description "Daily backup of web server volume"
+Parameters:
+--volume-id → ID of the EBS volume you want to snapshot.
+--description → Any helpful notes.
+
+============
+
+| Setting                  | Private (Default) ✅                    | Public ❌                                                      |
+| ------------------------ | -------------------------------------- | ------------------------------------------------------------- |
+| **Block Public Access**  | Enabled (all 4 options)                | Disabled (one or more unchecked)                              |
+| **Bucket Policy**        | None or only allows specific IAM users | Allows `"Principal": "*"` with `s3:GetObject` or more         |
+| **ACLs**                 | Owner = full control only              | Grants `READ` or `WRITE` to `AllUsers` / `AuthenticatedUsers` |
+| **Access from Internet** | Denied                                 | Allowed to anyone                                             |
+| **Security Risk**        | Low                                    | High (data leakage possible)                                  |
+
+
+
+Create Publicly Accessible RDS Instance
+
+1️⃣ Using AWS Management Console
+Sign in → Go to RDS.
+
+Click Create database.
+Choose:
+Engine → e.g., MySQL, PostgreSQL, etc.
+Templates → Choose production or dev/test.
+Under Connectivity:
+Public access → Select Yes.
+VPC Security Group → Must allow inbound traffic on the DB port (e.g., 3306 for MySQL) from your IP or 0.0.0.0/0 (dangerous).
+Configure:
+DB instance size → e.g., db.t3.micro.
+Storage → Size and type.
+Master username/password.
+Click Create database.
+After creation, find the Endpoint in the RDS dashboard → Use it to connect from outside AWS.
+
