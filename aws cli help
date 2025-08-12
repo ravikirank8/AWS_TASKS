@@ -1,0 +1,36 @@
+1) Discover the command (no Google method)
+
+aws ec2 help
+Scroll until you find something like terminate-instances.
+Check details:
+
+ aws ec2 help | grep -i terminate
+aws ec2 terminate-instances help
+
+You’ll see that it requires:
+--instance-ids (one or more)
+
+2) Get your instance ID
+
+aws ec2 describe-instances \
+    --query "Reservations[*].Instances[*].[InstanceId,State.Name,Tags[?Key=='Name']|[0].Value]" \
+    --output table
+3) Terminate the instance
+
+aws ec2 terminate-instances --instance-ids i-0123456789abcdef0
+
+4) Wait until it’s gone
+
+
+aws ec2 wait instance-terminated --instance-ids i-0123456789abcdef0
+
+5) Verify termination
+
+aws ec2 describe-instances --instance-ids i-0123456789abcdef0
+
+If it’s truly terminated, it won’t appear in active listings.
+
+💡 Tips:
+If you’re unsure, use --dry-run first:
+aws ec2 terminate-instances --instance-ids i-0123456789abcdef0 --dry-run
+Once terminated, the instance is gone forever — you can’t “start” it again; you’d have to launch a new one from an AMI or backup.
