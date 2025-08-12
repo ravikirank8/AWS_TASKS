@@ -1,3 +1,45 @@
+aws s3 ls | grep my-bucket-name
+
+If nothing shows up, either you’re in the wrong region or it doesn’t exist. Add --region <region> if needed.
+
+2) Transfer a single file
+
+aws s3 cp /path/to/local/file.txt s3://my-bucket-name/
+
+This will copy file.txt into the bucket root.
+If you want to put it inside a folder:
+
+aws s3 cp /path/to/local/file.txt s3://my-bucket-name/foldername/
+
+3) Transfer a whole directory
+
+aws s3 cp /local/directory s3://my-bucket-name/ --recursive
+
+4) Keep directory in sync (useful for backups/deployments)
+
+aws s3 sync /local/directory s3://my-bucket-name/
+This only uploads new/changed files.
+
+💡 Test first:
+aws s3 sync /local/directory s3://my-bucket-name/ --dryrun
+5) Transfer in the other direction (download from S3)
+
+aws s3 cp s3://my-bucket-name/file.txt /local/path/
+
+aws s3 sync s3://my-bucket-name/ /local/directory/
+
+6) Useful options
+--acl private → force uploaded files to be private
+--storage-class STANDARD_IA → store as infrequent access
+--exclude / --include → control what files get uploaded
+
+aws s3 sync /dir s3://bucket --exclude "*.tmp" --include "*.jpg"
+✅ Example: Upload a project folder to your existing bucket devops-s3-29232:
+
+aws s3 sync ./project s3://devops-s3-29232/ --acl private
+
+=========
+
 1) Discover the command (no Google method)
 
 aws ec2 help
